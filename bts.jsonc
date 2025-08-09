@@ -1,0 +1,28 @@
+// Better-T-Stack configuration file
+// safe to delete
+
+{
+  "$schema": "https://r2.better-t-stack.dev/schema.json",
+  "version": "2.30.0",
+  "createdAt": "2025-08-09T16:52:47.859Z",
+  "database": "mongodb",
+  "orm": "mongoose",
+  "backend": "elysia",
+  "runtime": "bun",
+  "frontend": [
+    "svelte"
+  ],
+  "addons": [
+    "pwa",
+    "tauri",
+    "turborepo",
+    "ultracite",
+    "vibe-rules"
+  ],
+  "examples": [],
+  "auth": true,
+  "packageManager": "bun",
+  "dbSetup": "none",
+  "api": "orpc",
+  "webDeploy": "none"
+}
