@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { authClient } from '$lib/auth-client';
 	import { goto } from '$app/navigation';
-
+    import { Button } from '$lib/components/ui/button/index.js';
+	
 	const sessionQuery = authClient.useSession();
 
 	async function handleSignOut() {
@@ -32,21 +33,18 @@
 			<span class="text-sm text-neutral-300 hidden sm:inline" title={user.email}>
 				{user.name || user.email?.split('@')[0] || 'User'}
 			</span>
-			<button
+			<Button
 				onclick={handleSignOut}
-				class="rounded px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white transition-colors"
+			
 			>
 				Sign Out
-			</button>
+			</Button>
 		</div>
 	{:else}
 		<div class="flex items-center gap-2">
-			<button
-				onclick={goToLogin}
-				class="rounded px-3 py-1 text-sm bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
-			>
+			<Button onclick={goToLogin}>
 				Sign In
-			</button>
+			</Button>
 		</div>
 	{/if}
 </div>

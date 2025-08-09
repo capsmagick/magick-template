@@ -3,6 +3,7 @@
 	import z from 'zod';
 	import { authClient } from '$lib/auth-client';
 	import { goto } from '$app/navigation';
+    import { Button } from '$lib/components/ui/button/index.js';
 
 	let { switchToSignUp } = $props<{ switchToSignUp: () => void }>();
 
@@ -17,7 +18,7 @@
 				await authClient.signIn.email(
 					{ email: value.email, password: value.password },
 					{
-						onSuccess: () => goto('/dashboard'),
+						onSuccess: () => goto('/(app)'),
 						onError: (error) => {
 							console.log(error.error.message || 'Sign in failed. Please try again.');
 						},
@@ -93,16 +94,16 @@
 
 		<form.Subscribe selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}>
 			{#snippet children(state)}
-				<button type="submit" class="w-full" disabled={!state.canSubmit || state.isSubmitting}>
-					{state.isSubmitting ? 'Submitting...' : 'Sign In'}
-				</button>
+				<Button type="submit" class="w-full" disabled={!state.canSubmit || state.isSubmitting}>
+					{state.isSubmitting ? 'Signing in…' : 'Sign In'}
+				</Button>
 			{/snippet}
 		</form.Subscribe>
 	</form>
 
 	<div class="mt-4 text-center">
-		<button type="button" class="text-indigo-600 hover:text-indigo-800" onclick={switchToSignUp}>
+		<Button type="button" variant="link" onclick={switchToSignUp}>
 			Need an account? Sign Up
-		</button>
+		</Button>
 	</div>
 </div>
