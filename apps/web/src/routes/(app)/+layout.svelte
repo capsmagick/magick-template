@@ -6,12 +6,12 @@
     import { createQuery } from '@tanstack/svelte-query';
     import { QueryClientProvider } from '@tanstack/svelte-query';
     import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
+	import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
+	import { Separator } from "$lib/components/ui/separator/index.js";
     import { queryClient } from '$lib/orpc';
     import { orpc } from '$lib/orpc';
     import { get } from 'svelte/store';
 	import AppSidebar from "$lib/components/app-sidebar.svelte";
-	import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
-	import { Separator } from "$lib/components/ui/separator/index.js";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 
      let { children } = $props();
@@ -19,6 +19,14 @@
     const sessionQuery = authClient.useSession();
 
 	const privateDataQuery = createQuery(orpc.privateData.queryOptions());
+
+	// Reactively watch for session changes
+	$effect(() => {
+		const { data: session, isPending } = $sessionQuery;
+		if (!session && !isPending) {
+			goto('/login');
+		}
+	});
 
 	onMount(() => {
 		const { data: session, isPending } = get(sessionQuery);

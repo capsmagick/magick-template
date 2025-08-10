@@ -10,6 +10,14 @@
 
 	const privateDataQuery = createQuery(orpc.privateData.queryOptions());
 
+	// Reactively watch for session changes
+	$effect(() => {
+		const { data: session, isPending } = $sessionQuery;
+		if (!session && !isPending) {
+			goto('/login');
+		}
+	});
+
 	onMount(() => {
 		const { data: session, isPending } = get(sessionQuery);
 		if (!session && !isPending) {
@@ -21,6 +29,7 @@
 {#if $sessionQuery.isPending}
 	<div>Loading...</div>
 {:else if !$sessionQuery.data}
+	<div>Redirecting to login...</div>
 {:else}
 	<div>
 		<h1>Dashboard</h1>

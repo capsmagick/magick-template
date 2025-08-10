@@ -12,11 +12,6 @@
 
 	// This is sample data.
 	const data = {
-		user: {
-			name: "shadcn",
-			email: "m@example.com",
-			avatar: "/avatars/shadcn.jpg",
-		},
 		teams: [
 			{
 				name: "Acme Inc",
@@ -148,12 +143,15 @@
 	import TeamSwitcher from "./team-switcher.svelte";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import type { ComponentProps } from "svelte";
+	import { authClient } from '$lib/auth-client';
 
 	let {
 		ref = $bindable(null),
 		collapsible = "icon",
 		...restProps
 	}: ComponentProps<typeof Sidebar.Root> = $props();
+	
+	const sessionQuery = authClient.useSession();
 </script>
 
 <Sidebar.Root {collapsible} {...restProps}>
@@ -165,7 +163,9 @@
 		<NavProjects projects={data.projects} />
 	</Sidebar.Content>
 	<Sidebar.Footer>
-		<NavUser user={data.user} />
+		{#if $sessionQuery.data}
+			<NavUser user={$sessionQuery.data.user} />
+		{/if}
 	</Sidebar.Footer>
 	<Sidebar.Rail />
 </Sidebar.Root>

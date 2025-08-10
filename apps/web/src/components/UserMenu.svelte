@@ -6,16 +6,24 @@
 	const sessionQuery = authClient.useSession();
 
 	async function handleSignOut() {
-		await authClient.signOut({
-		fetchOptions: {
-			onSuccess: () => {
-				goto('/');
-			},
-			onError: (error) => {
-				console.error('Sign out failed:', error);
-			}
+		try {
+			// First, navigate to login page to ensure UI updates
+			goto('/login', { replaceState: true });
+			
+			// Then perform the actual sign out
+			await authClient.signOut({
+				fetchOptions: {
+					onSuccess: () => {
+						console.log('Sign out successful');
+					},
+					onError: (error) => {
+						console.error('Sign out failed:', error);
+					}
+				}
+			});
+		} catch (error) {
+			console.error('Sign out error:', error);
 		}
-		});
 	}
 
 	function goToLogin() {

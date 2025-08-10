@@ -60,7 +60,7 @@ bun install
 - Create `apps/server/.env`:
 
 ```bash
-DATABASE_URL="mongodb://localhost:27017"
+DATABASE_URL="mongodb://localhost:27017/myDB"
 CORS_ORIGIN="http://localhost:5173"
 ```
 

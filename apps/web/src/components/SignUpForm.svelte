@@ -7,16 +7,19 @@
 
 	let { switchToSignIn } = $props<{ switchToSignIn: () => void }>();
 
+	let errorMessage = $state<string | null>(null);
+
 	const validationSchema = z.object({
 		name: z.string().min(2, 'Name must be at least 2 characters'),
 		email: z.email('Invalid email address'),
 		password: z.string().min(8, 'Password must be at least 8 characters'),
 	});
 
-
 	const form = createForm(() => ({
 		defaultValues: { name: '', email: '', password: '' },
 		onSubmit: async ({ value }) => {
+			errorMessage = null;
+			try {
 				await authClient.signUp.email(
 					{
 						email: value.email,
@@ -28,11 +31,21 @@
 							goto('/dashboard');
 						},
 						onError: (error) => {
-							console.log(error.error.message || 'Sign up failed. Please try again.');
+							console.log('Sign up error:', error);
+							
+							// Handle specific error cases
+							if (error.error?.code === 'USER_ALREADY_EXISTS') {
+								errorMessage = 'An account with this email already exists. Please sign in instead.';
+							} else {
+								errorMessage = error.error?.message || 'Sign up failed. Please try again.';
+							}
 						},
 					}
 				);
-
+			} catch (err) {
+				console.error('Unexpected error during sign up:', err);
+				errorMessage = 'An unexpected error occurred. Please try again.';
+			}
 		},
 		validators: {
 			onSubmit: validationSchema,
@@ -42,6 +55,21 @@
 
 <div class="mx-auto mt-10 w-full max-w-md p-6">
 	<h1 class="mb-6 text-center font-bold text-3xl">Create Account</h1>
+
+	{#if errorMessage}
+		<div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+			<p class="text-sm text-red-600">{errorMessage}</p>
+			{#if errorMessage.includes('already exists')}
+				<button 
+					type="button" 
+					class="mt-2 text-sm text-red-700 underline hover:no-underline"
+					onclick={switchToSignIn}
+				>
+					Switch to Sign In
+				</button>
+			{/if}
+		</div>
+	{/if}
 
 	<form
 		id="form"
@@ -61,7 +89,7 @@
 						name={field.name}
 						class="w-full border"
 						onblur={field.handleBlur}
-					 value={field.state.value}
+						value={field.state.value}
       oninput={(e: Event) => {
             const target = e.target as HTMLInputElement
             field.handleChange(target.value)
@@ -111,7 +139,7 @@
 						type="password"
 						class="w-full border"
 						onblur={field.handleBlur}
-					 value={field.state.value}
+						value={field.state.value}
       oninput={(e: Event) => {
             const target = e.target as HTMLInputElement
             field.handleChange(target.value)

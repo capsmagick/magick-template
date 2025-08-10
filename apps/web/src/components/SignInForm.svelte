@@ -4,8 +4,22 @@
 	import { authClient } from '$lib/auth-client';
 	import { goto } from '$app/navigation';
     import { Button } from '$lib/components/ui/button/index.js';
+    import { Input } from '$lib/components/ui/input/index.js';
+    import * as Password from '$lib/components/ui/password/index.js';
+    const ADMIN_EMAIL = 'admin@magick.template';
+    const ADMIN_PASSWORD = 'Pass@Magick';
 
 	let { switchToSignUp } = $props<{ switchToSignUp: () => void }>();
+
+	// Use the session store to monitor authentication state
+	const sessionQuery = authClient.useSession();
+
+	// Watch for session changes and redirect when available
+	$effect(() => {
+		if ($sessionQuery.data?.user) {
+			goto('/dashboard');
+		}
+	});
 
 	const validationSchema = z.object({
 		email: z.email('Invalid email address'),
@@ -15,16 +29,22 @@
 	const form = createForm(() => ({
 		defaultValues: { email: '', password: '' },
 		onSubmit: async ({ value }) => {
-				await authClient.signIn.email(
-					{ email: value.email, password: value.password },
-					{
-						onSuccess: () => goto('/(app)'),
-						onError: (error) => {
-							console.log(error.error.message || 'Sign in failed. Please try again.');
-						},
-					}
+			try {
+				const result = await authClient.signIn.email(
+					{ email: value.email, password: value.password }
 				);
-
+				
+				// Check if sign-in was successful
+				if (result && !result.error) {
+					// The session store will automatically update and trigger the redirect
+					// No need to manually redirect here
+					console.log('Sign in successful, waiting for session update...');
+				} else {
+					console.error('Sign in failed:', result?.error?.message || 'Unknown error');
+				}
+			} catch (error) {
+				console.error('Sign in error:', error);
+			}
 		},
 		validators: {
 			onSubmit: validationSchema,
@@ -47,17 +67,18 @@
 			{#snippet children(field)}
 				<div class="space-y-1">
 					<label for={field.name}>Email</label>
-					<input
+					<Input
 						id={field.name}
 						name={field.name}
 						type="email"
-						class="w-full border"
+						class="w-full"
 						onblur={field.handleBlur}
 						value={field.state.value}
-        oninput={(e: Event) => {
-            const target = e.target as HTMLInputElement
-            field.handleChange(target.value)
-          }}					/>
+						oninput={(e: Event) => {
+							const target = e.target as HTMLInputElement;
+							field.handleChange(target.value);
+						}}
+					/>
 					{#if field.state.meta.isTouched}
 						{#each field.state.meta.errors as error}
 							<p class="text-sm text-red-500" role="alert">{error}</p>
@@ -71,18 +92,15 @@
 			{#snippet children(field)}
 				<div class="space-y-1">
 					<label for={field.name}>Password</label>
-					<input
-						id={field.name}
-						name={field.name}
-						type="password"
-						class="w-full border"
-						onblur={field.handleBlur}
-					 value={field.state.value}
-      oninput={(e: Event) => {
-            const target = e.target as HTMLInputElement
-            field.handleChange(target.value)
-          }}
-					/>
+					<Password.Root>
+						<Password.Input
+							id={field.name}
+							name={field.name}
+							placeholder="Enter your password"
+							onblur={field.handleBlur}
+							bind:value={field.state.value}
+						/>
+					</Password.Root>
 					{#if field.state.meta.isTouched}
 						{#each field.state.meta.errors as error}
 							<p class="text-sm text-red-500" role="alert">{error}</p>
@@ -94,9 +112,17 @@
 
 		<form.Subscribe selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}>
 			{#snippet children(state)}
-				<Button type="submit" class="w-full" disabled={!state.canSubmit || state.isSubmitting}>
-					{state.isSubmitting ? 'Signing in…' : 'Sign In'}
-				</Button>
+				<div class="flex items-center gap-2">
+					<Button type="submit" class="w-full" disabled={!state.canSubmit || state.isSubmitting}>
+						{state.isSubmitting ? 'Signing in…' : 'Sign In'}
+					</Button>
+					<Button type="button" variant="outline" size="sm" onclick={() => {
+						form.setFieldValue('email', ADMIN_EMAIL);
+						form.setFieldValue('password', ADMIN_PASSWORD);
+					}}>
+						Fill admin creds
+					</Button>
+				</div>
 			{/snippet}
 		</form.Subscribe>
 	</form>
