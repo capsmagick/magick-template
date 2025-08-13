@@ -11,16 +11,7 @@
 			goto('/login', { replaceState: true });
 			
 			// Then perform the actual sign out
-			await authClient.signOut({
-				fetchOptions: {
-					onSuccess: () => {
-						console.log('Sign out successful');
-					},
-					onError: (error) => {
-						console.error('Sign out failed:', error);
-					}
-				}
-			});
+			await authClient.signOut();
 		} catch (error) {
 			console.error('Sign out error:', error);
 		}

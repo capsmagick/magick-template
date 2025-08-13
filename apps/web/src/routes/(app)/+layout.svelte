@@ -1,7 +1,6 @@
 <script lang="ts">
 
-    import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+    import { goto } from '$app/navigation';
 	import { authClient } from '$lib/auth-client';
     import { createQuery } from '@tanstack/svelte-query';
     import { QueryClientProvider } from '@tanstack/svelte-query';
@@ -10,7 +9,6 @@
 	import { Separator } from "$lib/components/ui/separator/index.js";
     import { queryClient } from '$lib/orpc';
     import { orpc } from '$lib/orpc';
-    import { get } from 'svelte/store';
 	import AppSidebar from "$lib/components/app-sidebar.svelte";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 
@@ -23,13 +21,6 @@
 	// Reactively watch for session changes
 	$effect(() => {
 		const { data: session, isPending } = $sessionQuery;
-		if (!session && !isPending) {
-			goto('/login');
-		}
-	});
-
-	onMount(() => {
-		const { data: session, isPending } = get(sessionQuery);
 		if (!session && !isPending) {
 			goto('/login');
 		}

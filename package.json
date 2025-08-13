@@ -14,7 +14,11 @@
     "dev:web": "turbo -F web dev",
     "dev:server": "turbo -F server dev"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@orpc/client": "^1.8.0",
+    "@orpc/server": "^1.8.0",
+    "@orpc/tanstack-query": "^1.8.0"
+  },
   "devDependencies": {
     "turbo": "^2.5.4",
     "@biomejs/biome": "2.1.2",

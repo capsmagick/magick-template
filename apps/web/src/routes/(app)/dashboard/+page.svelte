@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { authClient } from '$lib/auth-client';
 	import { orpc } from '$lib/orpc';
 	import { createQuery } from '@tanstack/svelte-query';
-	import { get } from 'svelte/store';
 
 	const sessionQuery = authClient.useSession();
 
@@ -13,13 +11,6 @@
 	// Reactively watch for session changes
 	$effect(() => {
 		const { data: session, isPending } = $sessionQuery;
-		if (!session && !isPending) {
-			goto('/login');
-		}
-	});
-
-	onMount(() => {
-		const { data: session, isPending } = get(sessionQuery);
 		if (!session && !isPending) {
 			goto('/login');
 		}

@@ -2,43 +2,37 @@
 	import SignInForm from '../../components/SignInForm.svelte';
 	import SignUpForm from '../../components/SignUpForm.svelte';
     import { Button } from '$lib/components/ui/button/index.js';
-    import { PUBLIC_SERVER_URL } from '$env/static/public';
+    import { orpc } from '$lib/orpc';
+    import { createMutation } from '@tanstack/svelte-query';
 
 	let showSignIn = $state(true);
 
-    let adminCreating = $state(false);
+    const createSuperAdminMutation = createMutation({
+        mutationFn: () => orpc.dev.ensureSuperAdmin.call(),
+        onSuccess: () => {
+            adminMessage = 'Super admin ensured. You can now sign in.';
+        },
+        onError: (error: any) => {
+            adminMessage = error instanceof Error ? error.message : 'Request failed';
+        }
+    });
+
     let adminMessage: string | null = $state(null);
 
-    async function createSuperAdmin() {
+    function createSuperAdmin() {
         adminMessage = null;
-        adminCreating = true;
-        try {
-            const res = await fetch(`${PUBLIC_SERVER_URL}/api/dev/ensure-superadmin`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (!res.ok) {
-                const text = await res.text().catch(() => '');
-                adminMessage = `Failed (${res.status}): ${text || 'Unable to create admin'}`;
-                return;
-            }
-            adminMessage = 'Super admin ensured. You can now sign in.';
-        } catch (err) {
-            adminMessage = err instanceof Error ? err.message : 'Request failed';
-        } finally {
-            adminCreating = false;
-        }
+        $createSuperAdminMutation.mutate();
     }
+
+    // Access mutation state properties from the store
+    let isPending = $derived($createSuperAdminMutation.isPending);
 </script>
 
 <div class="mx-auto mt-6 w-full max-w-md px-6">
     <div class="mb-4 flex items-center justify-between gap-2">
         <h2 class="text-sm text-muted-foreground">Admin setup</h2>
-        <Button type="button" size="sm" variant="outline" onclick={createSuperAdmin} disabled={adminCreating} aria-busy={adminCreating} aria-live="polite">
-            {adminCreating ? 'Creating…' : 'Create Super Admin'}
+        <Button type="button" size="sm" variant="outline" onclick={createSuperAdmin} disabled={isPending} aria-busy={isPending} aria-live="polite">
+            {isPending ? 'Creating…' : 'Create Super Admin'}
         </Button>
     </div>
     {#if adminMessage}

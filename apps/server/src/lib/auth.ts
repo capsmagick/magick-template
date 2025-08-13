@@ -33,4 +33,4 @@ export const auth = betterAuth({
       adminRoles: ["superadmin", "admin"],
     }),
   ],
-});
+}) as any;

@@ -20,28 +20,23 @@
 		onSubmit: async ({ value }) => {
 			errorMessage = null;
 			try {
-				await authClient.signUp.email(
-					{
-						email: value.email,
-						password: value.password,
-						name: value.name,
-					},
-					{
-						onSuccess: () => {
-							goto('/dashboard');
-						},
-						onError: (error) => {
-							console.log('Sign up error:', error);
-							
-							// Handle specific error cases
-							if (error.error?.code === 'USER_ALREADY_EXISTS') {
-								errorMessage = 'An account with this email already exists. Please sign in instead.';
-							} else {
-								errorMessage = error.error?.message || 'Sign up failed. Please try again.';
-							}
-						},
+				const result = await authClient.signUp.email({
+					email: value.email,
+					password: value.password,
+					name: value.name,
+				});
+				
+				if (result && 'error' in result) {
+					// Handle error case
+					if (result.error.message?.includes('already exists')) {
+						errorMessage = 'An account with this email already exists. Please sign in instead.';
+					} else {
+						errorMessage = result.error.message || 'Sign up failed. Please try again.';
 					}
-				);
+				} else {
+					// Success case
+					goto('/dashboard');
+				}
 			} catch (err) {
 				console.error('Unexpected error during sign up:', err);
 				errorMessage = 'An unexpected error occurred. Please try again.';

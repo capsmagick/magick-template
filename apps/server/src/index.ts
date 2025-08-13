@@ -1,10 +1,10 @@
 import "dotenv/config";
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
+import { swagger } from "@elysiajs/swagger";
 import { RPCHandler } from "@orpc/server/fetch";
 import { appRouter } from "./routers";
 import { createContext } from "./lib/context";
-import { auth } from "./lib/auth";
 
 const handler = new RPCHandler(appRouter);
 
@@ -17,21 +17,67 @@ const app = new Elysia()
       credentials: true,
     }),
   )
-  .all("/api/auth/*", async (context) => {
-    const { request } = context;
-    if (["POST", "GET"].includes(request.method)) {
-      return auth.handler(request);
-    }
-    context.error(405);
-  })
-  .all('/rpc*', async (context) => {
-    const { response } = await handler.handle(context.request, {
-      prefix: '/rpc',
-      context: await createContext({ context })
+  .use(
+    swagger({
+      documentation: {
+        info: {
+          title: "Magick Template API",
+          version: "1.0.0",
+          description: "API documentation for Magick Template server with ORPC integration"
+        },
+        tags: [
+          { name: "Health", description: "Health check endpoints" },
+          { name: "Info", description: "API information endpoints" },
+          { name: "Auth", description: "Authentication endpoints" },
+          { name: "Dev", description: "Development utilities" },
+          { name: "RPC", description: "ORPC remote procedure calls" }
+        ]
+      }
     })
-    return response ?? new Response('Not Found', { status: 404 })
+  )
+  .all('/rpc', async (context) => {
+    console.log("RPC request received:", context.request.method, context.request.url);
+    console.log("Request headers:", Object.fromEntries(context.request.headers.entries()));
+    
+    try {
+      const { response } = await handler.handle(context.request, {
+        prefix: '/rpc',
+        context: await createContext({ context })
+      });
+      console.log("RPC response:", response);
+      return response ?? new Response('Not Found', { status: 404 });
+    } catch (error) {
+      console.error("RPC error:", error);
+      return new Response(`RPC Error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
+    }
   })
-  .get("/", () => "OK")
-  .listen(3000, () => {
-    console.log("Server is running on http://localhost:3000");
+  .get("/", () => "OK", {
+    detail: {
+      summary: "Health Check",
+      description: "Simple health check endpoint",
+      tags: ["Health"]
+    }
+  })
+  .get("/api/health", () => ({ status: "OK", timestamp: new Date().toISOString() }), {
+    detail: {
+      summary: "API Health Check",
+      description: "Detailed health check with timestamp",
+      tags: ["Health"]
+    }
+  })
+  .get("/api/info", () => ({
+    name: "Magick Template API",
+    version: "1.0.0",
+    description: "API server with ORPC integration"
+  }), {
+    detail: {
+      summary: "API Information",
+      description: "Get API server information",
+      tags: ["Info"]
+    }
+  })
+  .listen(3000, (server) => {
+    const url = server.url;
+    console.log(`✅ Server is running on ${url}`);
+    console.log(`📚 Swagger documentation available at ${url}swagger`);
   });
