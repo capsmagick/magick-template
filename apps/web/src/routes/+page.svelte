@@ -154,7 +154,4 @@
     </div>
 </section>
 
-<!-- TEMPLATE DOCS: Remove this import and component usage for production -->
-{#await import('$lib/template-docs/components/TemplateShowcase.svelte') then { default: TemplateShowcase }}
-    <TemplateShowcase />
-{/await}
+

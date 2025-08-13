@@ -1,30 +1,3 @@
-<!--
-TEMPLATE DOCS REMOVAL INSTRUCTIONS:
-
-To remove template documentation navigation for production:
-
-1. Remove the template docs import:
-   - Remove: import { isTemplateDocsEnabled } from "$lib/template-docs/config.js";
-
-2. Remove template-specific navigation:
-   - Remove the `templateLinks` array
-   - Change `links` to just use `mainLinks`
-   - Remove the `isTemplate` property from NavLink type
-   - Remove `shouldShowTemplateSeparator` function
-
-3. Clean up navigation rendering:
-   - Remove template section separators in both desktop and mobile nav
-   - Remove `template-nav-link` class and `data-template-link` attributes
-   - Remove all comments marked with "TEMPLATE DOCS:"
-
-4. Test navigation:
-   - Verify main navigation still works
-   - Check mobile navigation functionality
-   - Ensure no broken links or styling issues
-
-The navigation will work normally without template documentation links.
--->
-
 <script lang="ts">
     import { ModeWatcher, toggleMode } from "mode-watcher";
     import SunIcon from "@lucide/svelte/icons/sun";
@@ -35,44 +8,20 @@ The navigation will work normally without template documentation links.
     import { Button } from "$lib/components/ui/button/index.js";
     import UserMenu from "./UserMenu.svelte";
     import { authClient } from "$lib/auth-client";
-    
-    // TEMPLATE DOCS: Import template documentation configuration
-    // Remove this import and related template navigation when removing template docs
-    import { isTemplateDocsEnabled } from "$lib/template-docs/config.js";
 
     type NavLink = { 
         to: string; 
         label: string; 
-        isTemplate?: boolean; // Mark template-specific links
     };
     
     // Main navigation links
-    const mainLinks: NavLink[] = [
+    const links: NavLink[] = [
         { to: "/", label: "Home" },
         { to: "/dashboard", label: "Dashboard" }
     ];
-    
-    // TEMPLATE DOCS: Template documentation navigation links
-    // Remove this entire array when removing template documentation
-    const templateLinks: NavLink[] = [
-        { to: "/guide", label: "Template Guide", isTemplate: true },
-        { to: "/roadmap", label: "Template Roadmap", isTemplate: true }
-    ];
-    
-    // Combine links based on template docs configuration
-    const links: NavLink[] = isTemplateDocsEnabled() 
-        ? [...mainLinks, ...templateLinks]
-        : mainLinks;
 
     let mobileOpen = false;
     const isActive = (to: string) => $page.url.pathname === to;
-    
-    // Helper to check if we should show template section separator
-    const shouldShowTemplateSeparator = (index: number, link: NavLink) => {
-        return isTemplateDocsEnabled() && 
-               link.isTemplate && 
-               index === mainLinks.length; // First template link
-    };
 
     // Session query for conditional header display
     const sessionQuery = authClient.useSession();
@@ -97,21 +46,13 @@ The navigation will work normally without template documentation links.
 
             <!-- Desktop nav -->
             <nav class="hidden items-center gap-6 md:flex" aria-label="Main">
-                {#each links as link, index (link.to)}
-                    <!-- TEMPLATE DOCS: Section separator for template documentation -->
-                    <!-- Remove this separator when removing template docs -->
-                    {#if shouldShowTemplateSeparator(index, link)}
-                        <div class="h-4 w-px bg-border" aria-hidden="true"></div>
-                        <span class="text-xs text-muted-foreground font-medium">Template Docs</span>
-                    {/if}
-                    
+                {#each links as link (link.to)}
                     <a
                         href={link.to}
                         aria-current={isActive(link.to) ? "page" : undefined}
                         class={`text-sm transition-colors hover:text-foreground ${
                             isActive(link.to) ? "text-foreground" : "text-muted-foreground"
-                        } ${link.isTemplate ? "template-nav-link" : ""}`}
-                        data-template-link={link.isTemplate ? "true" : undefined}
+                        }`}
                     >
                         {link.label}
                     </a>
@@ -151,22 +92,13 @@ The navigation will work normally without template documentation links.
         {#if mobileOpen}
             <div id="mobile-nav" class="md:hidden">
                 <nav class="container mx-auto flex flex-col gap-2 px-4 pb-4" aria-label="Mobile">
-                    {#each links as link, index (link.to)}
-                        <!-- TEMPLATE DOCS: Section separator for mobile template documentation -->
-                        <!-- Remove this separator when removing template docs -->
-                        {#if shouldShowTemplateSeparator(index, link)}
-                            <div class="border-t pt-2 mt-2">
-                                <span class="text-xs text-muted-foreground font-medium px-2 py-1">Template Docs</span>
-                            </div>
-                        {/if}
-                        
+                    {#each links as link (link.to)}
                         <a
                             href={link.to}
                             aria-current={isActive(link.to) ? "page" : undefined}
                             class={`rounded px-2 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${
                                 isActive(link.to) ? "text-foreground" : "text-muted-foreground"
-                            } ${link.isTemplate ? "template-nav-link" : ""}`}
-                            data-template-link={link.isTemplate ? "true" : undefined}
+                            }`}
                             onclick={() => (mobileOpen = false)}
                         >
                             {link.label}
