@@ -56,6 +56,34 @@
             "types": "./src/deps/query.ts",
             "default": "./dist/deps/query.js"
         },
+        "./deps/shared-modules": {
+            "types": "./src/deps/shared-modules.ts",
+            "default": "./dist/deps/shared-modules.js"
+        },
+        "./deps/elysia": {
+            "types": "./src/deps/elysia.ts",
+            "default": "./dist/deps/elysia.js"
+        },
+        "./deps": {
+            "types": "./src/deps/index.ts",
+            "default": "./dist/deps/index.js"
+        },
+        "./deps/orpc": {
+            "types": "./src/deps/orpc.ts",
+            "default": "./dist/deps/orpc.js"
+        },
+        "./deps/auth": {
+            "types": "./src/deps/auth.ts",
+            "default": "./dist/deps/auth.js"
+        },
+        "./deps/validation": {
+            "types": "./src/deps/validation.ts",
+            "default": "./dist/deps/validation.js"
+        },
+        "./deps/query": {
+            "types": "./src/deps/query.ts",
+            "default": "./dist/deps/query.js"
+        },
         "./deps/devtools": {
             "types": "./src/deps/devtools.ts",
             "default": "./dist/deps/devtools.js"
@@ -87,12 +115,9 @@
         "@orpc/client": "^1.8.0",
         "@orpc/server": "^1.8.0",
         "@orpc/tanstack-query": "^1.8.0",
-        "@tanstack/svelte-form": "^1.7.0",
         "@tanstack/svelte-query": "^5.74.4",
-        "@tanstack/svelte-query-devtools": "^5.74.6",
         "better-auth": "^1.3.4",
         "clsx": "^2.1.1",
-        "dayjs": "^1.11.13",
         "dotenv": "^17.2.1",
         "elysia": "^1.2.25",
         "mongoose": "^8.14.0",

@@ -1,8 +1,7 @@
-// Shared TanStack Query utilities and re-exports
+// Shared TanStack Query utilities and factory functions
 import { QueryClient, QueryCache } from "@tanstack/svelte-query";
-import { createQuery, createMutation } from "@tanstack/svelte-query";
 
-// Common query client factory
+// Factory function for creating query client with shared configuration
 export const createQueryClient = () => {
     return new QueryClient({
         queryCache: new QueryCache({
@@ -24,5 +23,12 @@ export const createQueryClient = () => {
     });
 };
 
-// Re-export all utilities
-export { QueryClient, QueryCache, createQuery, createMutation };
+// Query configuration helpers
+export const getQueryDefaults = () => ({
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry: 3,
+    refetchOnWindowFocus: false,
+});
+
+// Don't re-export QueryClient, QueryCache - apps should import directly

@@ -1,6 +1,9 @@
 import "dotenv/config";
-import { Elysia, cors, swagger } from "@repo/shared-core/deps";
-import { RPCHandler } from "@repo/shared-core/deps/orpc";
+import { Elysia } from "elysia";
+import { cors } from "@elysiajs/cors";
+import { swagger } from "@elysiajs/swagger";
+import { RPCHandler } from "@orpc/server/fetch";
+import { createCORSConfig, createSwaggerConfig } from "@repo/shared-core/deps/elysia";
 import { appRouter } from "./routers";
 import { createContext } from "./lib/context";
 import { auth } from "./lib/auth";
@@ -9,30 +12,15 @@ import { getServerConfig } from "@repo/shared-core/config/server";
 const handler = new RPCHandler(appRouter);
 
 const serverConfig = getServerConfig(process.env.NODE_ENV as "development" | "production");
+const corsConfig = createCORSConfig(serverConfig.trustedOrigins);
+const swaggerConfig = createSwaggerConfig("Magick Template API");
 
 // Debug server configuration
 console.log("🔧 Server Configuration:", JSON.stringify(serverConfig, null, 2));
 
 const app = new Elysia()
-  .use(cors(serverConfig.cors))
-  .use(
-    swagger({
-      documentation: {
-        info: {
-          title: "Magick Template API",
-          version: "1.0.0",
-          description: "API documentation for Magick Template server with ORPC integration"
-        },
-        tags: [
-          { name: "Health", description: "Health check endpoints" },
-          { name: "Info", description: "API information endpoints" },
-          { name: "Auth", description: "Authentication endpoints" },
-          { name: "Dev", description: "Development utilities" },
-          { name: "RPC", description: "ORPC remote procedure calls" }
-        ]
-      }
-    })
-  )
+  .use(cors(corsConfig))
+  .use(swagger(swaggerConfig))
   .mount(auth.handler)
   .all('/rpc*', async (context) => {
     console.log("RPC request received:", context.request.method, context.request.url);

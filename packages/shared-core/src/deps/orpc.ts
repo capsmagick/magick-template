@@ -1,10 +1,10 @@
-// Shared oRPC utilities and re-exports
+// Shared oRPC utilities and factory functions
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { RPCHandler } from "@orpc/server/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 
-// Common oRPC configuration
+// Factory function for creating RPC link with shared configuration
 export const createRPCLink = (url: string) => {
     return new RPCLink({
         url,
@@ -17,11 +17,18 @@ export const createRPCLink = (url: string) => {
     });
 };
 
-// Common oRPC client factory
+// Factory function for creating oRPC client
 export const createTypedORPCClient = (url: string) => {
     const link = createRPCLink(url);
     return createORPCClient(link);
 };
 
-// Re-export all utilities
-export { createORPCClient, RPCLink, RPCHandler, createTanstackQueryUtils };
+// oRPC configuration helpers
+export const getORPCDefaults = () => ({
+    credentials: "include" as const,
+    timeout: 30000,
+    retries: 3,
+});
+
+// Don't re-export the entire modules, just provide utilities
+// Apps should import these directly: createORPCClient, RPCLink, etc.

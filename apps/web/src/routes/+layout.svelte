@@ -1,6 +1,5 @@
 <script lang="ts">
     import { QueryClientProvider } from '@tanstack/svelte-query';
-    import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
     import '../app.css';
     import { queryClient } from '$lib/orpc';
     import { onMount } from 'svelte';
@@ -8,6 +7,7 @@
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
     import { authClient } from '$lib/auth-client';
+    import { dev } from '$app/environment';
     
     let { children } = $props();
     
@@ -36,5 +36,9 @@
 			{@render children()}
 		</main>
     </div>
-    <SvelteQueryDevtools />
+    {#if dev}
+        {#await import('@tanstack/svelte-query-devtools') then { SvelteQueryDevtools }}
+            <SvelteQueryDevtools />
+        {/await}
+    {/if}
 </QueryClientProvider>

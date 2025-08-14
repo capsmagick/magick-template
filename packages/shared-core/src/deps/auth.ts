@@ -1,31 +1,31 @@
-// Shared Better Auth utilities and re-exports
+// Shared authentication utilities and factory functions
 import { createAuthClient } from "better-auth/svelte";
-import { betterAuth } from "better-auth";
-import { admin } from "better-auth/plugins";
-import { mongodbAdapter } from "better-auth/adapters/mongodb";
 
-// Common auth client factory
-export const createBetterAuthClient = (baseURL: string) => {
+// Factory function for creating Better Auth client
+export const createBetterAuthClient = (baseURL: string): any => {
     return createAuthClient({
         baseURL,
     });
 };
 
-// Common auth configuration
-export const createAuthConfig = (database: any, trustedOrigins: string[]): any => {
-    return {
-        database,
-        trustedOrigins,
-        emailAndPassword: {
-            enabled: true,
-        },
-        plugins: [
-            admin({
-                adminRoles: ["superadmin", "admin"],
-            }),
-        ],
-    };
-};
+// Factory function for creating Better Auth server configuration
+export const createBetterAuthServerConfig = (options: {
+    database: any;
+    trustedOrigins: string[];
+    secret?: string;
+}) => ({
+    database: options.database,
+    trustedOrigins: options.trustedOrigins,
+    secret: options.secret,
+    emailAndPassword: {
+        enabled: true,
+    },
+});
 
-// Re-export all utilities
-export { createAuthClient, betterAuth, admin, mongodbAdapter };
+// Common auth configuration helpers
+export const getAuthDefaults = () => ({
+    sessionDuration: 60 * 60 * 24 * 7, // 7 days
+    impersonationSessionDuration: 60 * 60 * 24 * 7, // 7 days
+});
+
+// Don't re-export betterAuth, admin, etc. - apps should import directly

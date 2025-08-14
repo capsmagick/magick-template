@@ -1,15 +1,48 @@
 // Unified environment configuration for all apps
 import { DEFAULT_PORTS, DEFAULT_URLS } from "./constants.js";
 
-// Get environment variable with fallback
+// Check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
+
+// Get environment variable with fallback - handles both Node.js and browser
 const getEnvVar = (key: string, fallback: string = ""): string => {
-    return process.env[key] || fallback;
+    if (isBrowser) {
+        // In browser, use import.meta.env
+        // For client-side variables, check both VITE_ prefixed and built-in Vite vars
+        const env = import.meta.env as any;
+
+        // First try the exact key (for built-in Vite vars like NODE_ENV, MODE, etc.)
+        if (env[key] !== undefined) {
+            return env[key];
+        }
+
+        // Then try with VITE_ prefix for custom variables
+        const viteKey = `VITE_${key}`;
+        if (env[viteKey] !== undefined) {
+            return env[viteKey];
+        }
+
+        return fallback;
+    } else {
+        // In Node.js, use process.env
+        return process.env[key] || fallback;
+    }
 };
 
 // Get current environment
 export const getEnvironment = (): "development" | "production" | "test" => {
-    const env = getEnvVar("NODE_ENV", "development");
-    return env as "development" | "production" | "test";
+    if (isBrowser) {
+        // In browser, use Vite's built-in environment detection
+        const isDev = (import.meta.env as any).DEV;
+        const isProd = (import.meta.env as any).PROD;
+        if (isProd) return "production";
+        if (isDev) return "development";
+        return "development"; // fallback
+    } else {
+        // In Node.js, use NODE_ENV
+        const env = getEnvVar("NODE_ENV", "development");
+        return env as "development" | "production" | "test";
+    }
 };
 
 // Get all environment variables for the monorepo
