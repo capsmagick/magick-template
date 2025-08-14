@@ -1,29 +1,19 @@
-import { PUBLIC_SERVER_URL } from "$env/static/public";
-import { createORPCClient } from "@orpc/client";
-import { RPCLink } from "@orpc/client/fetch";
-import type { RouterClient } from "@orpc/server";
-import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-import { QueryCache, QueryClient } from "@tanstack/svelte-query";
-import type { AppRouter } from "../../../server/src/routers/index";
+import { createORPCClient, createRPCLink, createTanstackQueryUtils } from "@repo/shared-core/deps/orpc";
+import { createQueryClient } from "@repo/shared-core/deps/query";
+import { getPublicServerUrl } from "@repo/shared-core/config";
 
-export const queryClient = new QueryClient({
-	queryCache: new QueryCache({
-		onError: (error) => {
-			console.error(`Error: ${error.message}`);
-		},
-	}),
-});
+// Simple, direct configuration using shared environment
+const isDevelopment = import.meta.env.MODE === "development";
 
-export const link = new RPCLink({
-	url: `${PUBLIC_SERVER_URL}/rpc`,
-	fetch(url, options) {
-		return fetch(url, {
-			...options,
-			credentials: "include",
-		});
-	},
-});
+export const queryClient = createQueryClient();
 
-export const client: RouterClient<AppRouter> = createORPCClient(link);
+// Simple RPC link configuration using shared config
+const serverUrl = getPublicServerUrl();
+const rpcUrl = serverUrl ? `${serverUrl}/rpc` : "/rpc";
+
+export const link = createRPCLink(rpcUrl);
+
+// Create the oRPC client without strict typing to avoid constraint issues
+export const client = createORPCClient(link);
 
 export const orpc = createTanstackQueryUtils(client);

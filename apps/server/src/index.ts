@@ -1,22 +1,20 @@
 import "dotenv/config";
-import { Elysia } from "elysia";
-import { cors } from "@elysiajs/cors";
-import { swagger } from "@elysiajs/swagger";
-import { RPCHandler } from "@orpc/server/fetch";
+import { Elysia, cors, swagger } from "@repo/shared-core/deps";
+import { RPCHandler } from "@repo/shared-core/deps/orpc";
 import { appRouter } from "./routers";
 import { createContext } from "./lib/context";
+import { auth } from "./lib/auth";
+import { getServerConfig } from "@repo/shared-core/config/server";
 
 const handler = new RPCHandler(appRouter);
 
+const serverConfig = getServerConfig(process.env.NODE_ENV as "development" | "production");
+
+// Debug server configuration
+console.log("🔧 Server Configuration:", JSON.stringify(serverConfig, null, 2));
+
 const app = new Elysia()
-  .use(
-    cors({
-      origin: process.env.CORS_ORIGIN || "",
-      methods: ["GET", "POST", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      credentials: true,
-    }),
-  )
+  .use(cors(serverConfig.cors))
   .use(
     swagger({
       documentation: {
@@ -35,10 +33,11 @@ const app = new Elysia()
       }
     })
   )
-  .all('/rpc', async (context) => {
+  .mount(auth.handler)
+  .all('/rpc*', async (context) => {
     console.log("RPC request received:", context.request.method, context.request.url);
     console.log("Request headers:", Object.fromEntries(context.request.headers.entries()));
-    
+
     try {
       const { response } = await handler.handle(context.request, {
         prefix: '/rpc',
@@ -50,6 +49,8 @@ const app = new Elysia()
       console.error("RPC error:", error);
       return new Response(`RPC Error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
     }
+  }, {
+    parse: 'none' // Disable Elysia body parser to prevent "body already used" error
   })
   .get("/", () => "OK", {
     detail: {
@@ -76,7 +77,7 @@ const app = new Elysia()
       tags: ["Info"]
     }
   })
-  .listen(3000, (server) => {
+  .listen(serverConfig.port, (server) => {
     const url = server.url;
     console.log(`✅ Server is running on ${url}`);
     console.log(`📚 Swagger documentation available at ${url}swagger`);

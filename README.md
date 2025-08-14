@@ -57,23 +57,31 @@ bun install
 
 ### 2) Configure environment
 
-- Create `apps/server/.env`:
+- Create a single `.env` file in the root directory (copy from `.env.example`):
 
 ```bash
-DATABASE_URL="mongodb://localhost:27017/myDB"
-CORS_ORIGIN="http://localhost:5173"
-```
+# Server Configuration
+PORT=3000
+CORS_ORIGIN=http://localhost:5173,http://localhost:5174,http://localhost:5175
+DATABASE_URL=mongodb://localhost:27017/myDB
 
-- Create `apps/web/.env`:
+# Authentication
+BETTER_AUTH_SECRET=your-secret-here
+BETTER_AUTH_URL=http://localhost:3000
 
-```bash
-PUBLIC_SERVER_URL="http://localhost:3000"
+# Client Configuration
+PUBLIC_SERVER_URL=http://localhost:3000
+
+# Development
+SHOW_TEMPLATE_DOCS=true
+NODE_ENV=development
 ```
 
 Notes:
 
-- `CORS_ORIGIN` must match the dev web URL. See `apps/server/src/index.ts` CORS setup.
-- `PUBLIC_SERVER_URL` is embedded at build time by SvelteKit (used by oRPC + Auth client).
+- All apps use the unified environment configuration from `@repo/shared-core`
+- No need for separate `.env` files in each app - everything is centralized!
+- The client app runs on port 5175 (added to CORS_ORIGIN)
 
 ### 3) Run in development
 

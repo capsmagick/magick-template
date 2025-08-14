@@ -1,5 +1,6 @@
 import type { Context as ElysiaContext } from "elysia";
 import { auth } from "./auth";
+import type { SessionContext } from "@repo/shared-core/types/orpc";
 
 export type CreateContextOptions = {
   context: ElysiaContext;
@@ -14,6 +15,5 @@ export async function createContext({ context }: CreateContextOptions) {
     request: context.request,
   };
 }
-
 
 export type Context = Awaited<ReturnType<typeof createContext>>;

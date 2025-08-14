@@ -1,0 +1,437 @@
+---
+alwaysApply: false
+---
+# Design System and UI Rules
+
+## Core Design Principles
+
+### Fundamental Design Laws
+Follow these universal design principles for cohesive, intuitive interfaces:
+
+1. **Simplicity (Occam's Razor)** - The simplest solution is often best; eliminate unnecessary complexity
+2. **Visual Hierarchy** - Important elements should stand out through size, color, or position
+3. **Consistency (Jakob's Law)** - Users expect interfaces to work like other familiar ones
+4. **Accessibility** - Designs must be usable by everyone, including those with disabilities
+5. **Proximity** - Related elements should be grouped visually
+6. **Feedback** - Users should receive immediate visual feedback on interactions (< 400ms)
+7. **White Space** - Proper spacing creates visual breathing room and improves readability
+
+### Universal Design Laws Applied
+- **Fitts's Law** - Make interactive elements appropriately sized and positioned
+- **Hick's Law** - Limited color palette and clear options reduce decision time
+- **Miller's Law** - Limited number of theme variables for easier comprehension
+- **Jakob's Law** - Use familiar design patterns to leverage users' existing mental models
+- **Law of Proximity** - Group related elements visually to indicate relationships
+
+### Visual Hierarchy
+- **ALWAYS** use consistent typography scale (`text-2xl`, `text-lg`, `text-sm`)
+- **ALWAYS** establish clear visual hierarchy with size, color, and spacing
+- Use whitespace effectively to create breathing room
+- Group related elements with proximity principles
+
+### Color System
+- **ALWAYS** use semantic color tokens instead of arbitrary values
+- Each color has a specific purpose, following cognitive principles:
+  - **Primary**: Main action buttons, links, focus states (key interactive elements)
+  - **Secondary**: Less prominent actions, supporting UI elements
+  - **Muted**: Background elements, disabled states (de-emphasized elements)
+  - **Accent**: Highlights, notifications, badges (use sparingly)
+  - **Destructive**: Delete actions, warnings, errors
+
+
+## Tailwind CSS Standards
+
+### Responsive Design
+- **ALWAYS** use mobile-first approach
+- Use standard breakpoints: `sm` (640px), `md` (768px), `lg` (1024px), `xl` (1280px), `2xl` (1536px)
+- Apply responsive variants thoughtfully
+
+```html
+<!-- ✅ CORRECT - Mobile-first -->
+<div class="text-center sm:text-left">
+  Content
+</div>
+
+<!-- ❌ INCORRECT - Desktop-first -->
+<div class="sm:text-center">
+  Content
+</div>
+```
+
+### Typography System
+- Establish a clear type scale with defined font sizes and weights
+- Optimize line length (45-75 characters) and line height (around 1.5x) for readability
+- Adjust letter spacing for headings or small text if needed
+- Prefer left alignment for longer blocks of text
+- Use Tailwind's utility classes for consistent typography
+
+### Spacing and Layout
+- Use a consistent modular spacing scale based on Tailwind's spacing utilities
+- Start with generous whitespace and reduce as needed
+- Ensure more space around groups of elements than within them
+- Avoid making components unnecessarily wide; consider using max-width
+- Use Tailwind's padding, margin, and space-between utilities
+
+### Spacing Hierarchy
+- Use consistent spacing scale: `gap-6` for sections, `gap-4` for elements, `gap-2` for tight spacing
+- Apply vertical spacing with `space-y-*` utilities
+- Use padding hierarchy: `p-6` for pages, `p-4` for cards, `p-0` for table content
+
+```html
+<!-- Page layout spacing -->
+<div class="space-y-6">
+  <!-- Card spacing -->
+  <div class="space-y-4">
+    <!-- Form field spacing -->
+    <div class="space-y-2">
+      <label>Field</label>
+      <input />
+    </div>
+  </div>
+</div>
+```
+
+### Creating Depth and Visual Separation
+- Use subtle shadows to create elevation and indicate interactivity
+- Minimize borders in favor of spacing, background colors, and shadows
+- Apply the 80/20 rule - focus most design effort on commonly used elements
+- Create visual hierarchy through size, contrast, and position
+
+### Feature-First Component Approach
+1. Prioritize the functionality of each component before considering its layout within a larger application
+2. Start with low-fidelity sketches to define core features
+
+## Component Patterns
+
+### Button Variants
+- **ALWAYS** use consistent button patterns across the application
+- Use appropriate variants for different actions
+
+```html
+<!-- Primary action -->
+<Button>
+  <Plus class="mr-2 h-4 w-4" />
+  Create Item
+</Button>
+
+<!-- Secondary action -->
+<Button variant="outline">
+  <ArrowLeft class="mr-2 h-4 w-4" />
+  Cancel
+</Button>
+
+<!-- Destructive action -->
+<Button variant="destructive">
+  <Trash2 class="mr-2 h-4 w-4" />
+  Delete
+</Button>
+
+<!-- Loading state -->
+<Button disabled={isLoading}>
+  {#if isLoading}
+    <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+    Processing...
+  {:else}
+    <Save class="mr-2 h-4 w-4" />
+    Save
+  {/if}
+</Button>
+```
+
+### Form Layouts
+- **ALWAYS** use consistent form field structure
+- Provide helper text and error states
+- Use responsive grid layouts
+
+```html
+<!-- Standard form field -->
+<div class="space-y-2">
+  <Label for="fieldName">Field Label</Label>
+  <Input 
+    id="fieldName" 
+    placeholder="Enter value..." 
+    bind:value={formData.field}
+    required
+  />
+  <p class="text-xs text-muted-foreground">
+    Helper text for the field
+  </p>
+</div>
+
+<!-- Responsive form grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- Form fields -->
+</div>
+```
+
+### Table Patterns
+- **ALWAYS** wrap tables in Card components with `p-0`
+- Use consistent action column patterns
+- Implement proper loading and empty states
+
+```html
+<Card>
+  <CardContent class="p-0">
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead class="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {#each items as item}
+          <TableRow>
+            <TableCell>{item.name}</TableCell>
+            <TableCell>{item.status}</TableCell>
+            <TableCell class="text-right">
+              <div class="flex items-center justify-end space-x-2">
+                <Button variant="ghost" size="icon">
+                  <Pencil class="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <Trash2 class="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        {/each}
+      </TableBody>
+    </Table>
+  </CardContent>
+</Card>
+```
+
+## Page Layout Standards
+
+
+### Search and Filter Patterns
+- **ALWAYS** use consistent search input patterns
+- Implement filter sections in Card components
+
+```html
+<Card>
+  <CardHeader>
+    <CardTitle class="text-lg">Filters</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div class="flex flex-col sm:flex-row gap-4">
+      <!-- Search input -->
+      <div class="flex-1">
+        <div class="relative">
+          <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input 
+            type="search" 
+            placeholder="Search..." 
+            class="pl-8" 
+            bind:value={searchTerm} 
+          />
+        </div>
+      </div>
+      
+      <!-- Filter actions -->
+      <div class="flex gap-2">
+        <Button variant="outline" onclick={resetFilters}>
+          Reset
+        </Button>
+        <Button variant="secondary" onclick={applyFilters}>
+          <Filter class="mr-2 h-4 w-4" />
+          Apply
+        </Button>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+```
+
+## State Management Patterns
+
+### Loading States
+- **ALWAYS** provide loading indicators for async operations
+- Use consistent loading UI patterns
+
+```svelte
+{#if isLoading}
+  <div class="flex justify-center py-12">
+    <Loader2 class="h-8 w-8 animate-spin text-primary" />
+  </div>
+{:else}
+  <!-- Content -->
+{/if}
+```
+
+### Empty States
+- **ALWAYS** provide meaningful empty states
+- Include call-to-action buttons when appropriate
+
+```html
+<div class="text-center py-12">
+  <Package class="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+  <h3 class="text-lg font-semibold mb-2">No items found</h3>
+  <p class="text-muted-foreground mb-4">
+    Get started by creating your first item.
+  </p>
+  <Button onclick={createNew}>
+    <Plus class="mr-2 h-4 w-4" />
+    Create Item
+  </Button>
+</div>
+```
+
+### Error States
+- **ALWAYS** handle errors gracefully with user-friendly messages
+- Use appropriate error styling
+
+```html
+<!-- Alert format -->
+{#if error}
+  <Alert variant="destructive">
+    <AlertDescription>{error}</AlertDescription>
+  </Alert>
+{/if}
+
+<!-- Inline format -->
+<div class="bg-destructive/10 text-destructive p-3 rounded-md">
+  {error}
+</div>
+```
+
+### Success States
+- **ALWAYS** provide feedback for successful operations
+
+```html
+{#if success}
+  <Alert variant="default" class="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 border-green-200 dark:border-green-900">
+    <AlertDescription>{success}</AlertDescription>
+  </Alert>
+{/if}
+```
+
+## Icon Standards
+
+### Icon Usage
+- **ALWAYS** use Lucide icons for consistency
+- Use standard icon sizes: `h-4 w-4` for buttons, `h-12 w-12` for empty states
+- Use semantic icons for common actions
+
+```typescript
+// Standard action icons
+const icons = {
+  create: Plus,
+  edit: Pencil,
+  delete: Trash2,
+  view: Eye,
+  search: Search,
+  filter: Filter,
+  loading: Loader2,
+  settings: Settings,
+  back: ArrowLeft,
+  save: Save,
+  cancel: X
+};
+```
+
+### Icon Spacing
+- Use `mr-2` for icons before text
+- Use `ml-2` for icons after text
+- Maintain consistent spacing in button compositions
+
+## Accessibility Rules
+
+### Accessibility Considerations
+- Ensure sufficient color contrast (WCAG AA minimum)
+- Make interactive elements obvious and provide appropriate focus states
+- Use semantic HTML elements
+- Support keyboard navigation
+
+### Keyboard Navigation
+- **ALWAYS** use proper semantic HTML elements
+- Support keyboard navigation with `tabindex` and `role` attributes
+- Provide focus indicators with ring classes
+
+```html
+<!-- ✅ CORRECT -->
+<Button onclick={handleClick}>Action</Button>
+
+<!-- ❌ INCORRECT -->
+<div onclick={handleClick}>Action</div>
+```
+
+### ARIA Labels
+- **ALWAYS** provide `aria-label` for icon-only buttons
+- Use proper heading hierarchy
+- Ensure sufficient color contrast
+
+```html
+<Button variant="ghost" size="icon" aria-label="Edit item">
+  <Pencil class="h-4 w-4" />
+</Button>
+```
+
+## Animation and Transitions
+
+### Micro-interactions
+- Use subtle transitions for state changes
+- Provide immediate feedback (< 400ms)
+- Use consistent easing functions
+
+```css
+/* Button hover transitions */
+.button {
+  @apply transition-colors duration-200 ease-in-out;
+}
+
+/* Loading animations */
+.loading {
+  @apply animate-spin;
+}
+```
+
+## Grid and Layout Systems
+
+### Responsive Grids
+- Use consistent grid patterns for different content types
+
+```html
+<!-- Two column layout -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+<!-- Three column layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+<!-- Sidebar + Main (1/3 + 2/3) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-1"><!-- Sidebar --></div>
+  <div class="lg:col-span-2"><!-- Main --></div>
+</div>
+```
+
+## Best Practices Summary
+
+### DO's
+1. **Always** use semantic color tokens from the design system
+2. **Always** follow the spacing hierarchy (gap-6, gap-4, gap-2)
+3. **Always** implement proper loading, error, and empty states
+4. **Always** use consistent component patterns
+5. **Always** support responsive design with mobile-first approach
+6. **Always** maintain accessibility standards
+7. **Always** use proper icon sizing and spacing
+8. **Always** provide user feedback for interactions
+
+### DON'Ts
+1. **Never** use arbitrary color values
+2. **Never** skip responsive design considerations
+3. **Never** forget to handle edge cases (loading, error, empty)
+4. **Never** use inconsistent spacing patterns
+5. **Never** ignore accessibility requirements
+6. **Never** mix different icon libraries
+7. **Never** forget to provide proper focus states
+8. **Never** skip semantic HTML elements
+
+### Performance Considerations
+1. Use Tailwind's utility classes for optimal CSS size
+2. Implement proper image optimization
+3. Use CSS Grid and Flexbox efficiently
+4. Minimize custom CSS when Tailwind utilities suffice
+5. Leverage browser caching for consistent design tokens 
