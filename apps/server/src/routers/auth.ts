@@ -1,9 +1,9 @@
-import { os } from "../lib/orpc";
+import { publicProcedure } from "../lib/orpc";
 import { auth } from "../lib/auth";
 import { SignInSchema, SignUpSchema } from "@repo/shared-core/types/auth";
 
 export const authRouter = {
-  signIn: os
+  signIn: publicProcedure
     .input(SignInSchema)
     .handler(async ({ input }) => {
       const result = await auth.api.signInEmail({
@@ -17,7 +17,7 @@ export const authRouter = {
       };
     }),
 
-  signUp: os
+  signUp: publicProcedure
     .input(SignUpSchema)
     .handler(async ({ input }) => {
       const result = await auth.api.signUpEmail({
@@ -32,11 +32,11 @@ export const authRouter = {
       };
     }),
 
-  getSession: os
+  getSession: publicProcedure
     .handler(async ({ context }) => {
       // Access session from context if available
       const session = await auth.api.getSession({
-        headers: context.headers || {},
+        headers: context.request.headers || {},
       });
 
       return {
@@ -45,10 +45,10 @@ export const authRouter = {
       };
     }),
 
-  signOut: os
+  signOut: publicProcedure
     .handler(async ({ context }) => {
       const result = await auth.api.signOut({
-        headers: context.headers || {},
+        headers: context.request.headers || {},
       });
 
       return {

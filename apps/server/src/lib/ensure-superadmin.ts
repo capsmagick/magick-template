@@ -32,16 +32,15 @@ export async function ensureSuperAdmin(args: EnsureArgs): Promise<void> {
     // Use admin API endpoints (types expect specific literals but runtime accepts string|string[])
     await auth.api.setUserPassword({
       body: { userId: existingUser.id, newPassword: password },
-    }).catch(() => {});
+    }).catch(() => { });
     await auth.api.setRole({
-      // @ts-expect-error runtime accepts string|string[]
-      body: { userId: existingUser.id, role },
+      body: { userId: existingUser.id, role: Array.isArray(role) ? role.join(",") : role },
     }).catch(async () => {
       await ctx.adapter.update({
         model: "user",
-        where: [ { field: "id", value: existingUser.id } ],
+        where: [{ field: "id", value: existingUser.id }],
         update: { role: Array.isArray(role) ? (role as any).join(",") : (role as any) },
-      }).catch(() => {});
+      }).catch(() => { });
     });
     return;
   }
@@ -80,7 +79,7 @@ export async function ensureSuperAdmin(args: EnsureArgs): Promise<void> {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         role: Array.isArray(role) ? role.join(",") : (role as any),
       },
-    }).catch(() => {});
+    }).catch(() => { });
   }
 }
 
