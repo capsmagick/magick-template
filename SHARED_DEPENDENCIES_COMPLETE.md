@@ -9,7 +9,7 @@ Successfully implemented comprehensive node module sharing across all apps throu
 ### ✅ **Before: Scattered Dependencies**
 ```json
 // Server had: dotenv, elysia, mongoose, @orpc/*, better-auth, zod
-// Web had: @tanstack/*, better-auth, zod, clsx, @orpc/*
+// Admin had: @tanstack/*, better-auth, zod, clsx, @orpc/*
 // Client had: @tanstack/*, better-auth, zod, clsx, @orpc/*
 // Total: ~50+ duplicate dependencies across apps
 ```
@@ -17,7 +17,7 @@ Successfully implemented comprehensive node module sharing across all apps throu
 ### ✅ **After: Centralized Dependencies**
 ```json
 // Server: Only @repo/shared-core
-// Web: Only @repo/shared-core + TipTap extensions
+// Admin: Only @repo/shared-core + TipTap extensions
 // Client: Only @repo/shared-core
 // All shared dependencies in shared-core: 12 core packages
 ```
@@ -124,7 +124,7 @@ export const throttle = <T>(...) => { /* ... */ };
 }
 ```
 
-### **Web App**
+### **Admin App**
 ```json
 // Before: 25+ runtime dependencies
 {
@@ -282,12 +282,12 @@ export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 - Utilities: `clsx`, `dayjs`, `dotenv`
 
 ### **✅ App-Specific** (kept in individual apps)
-- Rich text editing: `@tiptap/*` (only in web app)
+- Rich text editing: `@tiptap/*` (only in admin app)
 - UI components: `bits-ui`, `tailwind-*` (SvelteKit specific)
 - Development tools: `vite`, `svelte-check` (build tools)
 
 ### **✅ Eliminated Duplicates**
-- Removed `clsx` from web and client (now in shared-core)
+- Removed `clsx` from admin and client (now in shared-core)
 - Removed `@tanstack/svelte-query-devtools` from apps
 - Removed all server deps from server app
 - Consolidated all authentication dependencies

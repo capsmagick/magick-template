@@ -28,7 +28,7 @@ Successfully consolidated all packages and created a unified environment configu
 ```bash
 # ❌ Before: Multiple .env files
 apps/server/.env
-apps/web/.env  
+apps/admin/.env  
 apps/client/.env
 
 # ✅ After: Single unified .env
@@ -94,7 +94,7 @@ const serverConfig = getServerConfig(process.env.NODE_ENV);
 // Automatically gets: port, cors, database, auth config
 ```
 
-### **Web App** (`apps/web`)
+### **Admin App** (`apps/admin`)
 ```typescript
 // No more PUBLIC_SERVER_URL imports from SvelteKit
 import { getPublicServerUrl } from "@repo/shared-core/config";
@@ -116,7 +116,7 @@ const serverUrl = getPublicServerUrl();  // From unified .env
 ```bash
 ✅ @repo/shared-core#build    - 5.308s
 ✅ server#build               - 334ms  
-✅ web#build                  - 39.88s
+✅ admin#build                - 39.88s
 ✅ client#build               - 17.11s
 ✅ Full monorepo build        - 43.084s
 ```

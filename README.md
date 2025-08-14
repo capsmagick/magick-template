@@ -10,14 +10,14 @@ Production-ready SvelteKit + Elysia starter with type-safe RPC, modern UI, deskt
 
 ## Tech Stack
 
-- **Frontend**: SvelteKit 2, Svelte 5, Tailwind CSS 4 (`apps/web/src/app.css`)
-- **UI**: shadcn-svelte component suite + extras (`apps/web/components.json`, `apps/web/jsrepo.json`, `apps/web/src/lib/components/ui/**`)
-- **Rich text**: Tiptap-based Edra editor (`apps/web/src/lib/components/edra/**`)
-- **Data layer**: oRPC client + TanStack Query (`apps/web/src/lib/orpc.ts`)
-- **Auth**: Better Auth (email/password) with MongoDB adapter (`apps/server/src/lib/auth.ts`, client: `apps/web/src/lib/auth-client.ts`)
+- **Frontend**: SvelteKit 2, Svelte 5, Tailwind CSS 4 (`apps/admin/src/app.css`)
+- **UI**: shadcn-svelte component suite + extras (`apps/admin/components.json`, `apps/admin/jsrepo.json`, `apps/admin/src/lib/components/ui/**`)
+- **Rich text**: Tiptap-based Edra editor (`apps/admin/src/lib/components/edra/**`)
+- **Data layer**: oRPC client + TanStack Query (`apps/admin/src/lib/orpc.ts`)
+- **Auth**: Better Auth (email/password) with MongoDB adapter (`apps/server/src/lib/auth.ts`, client: `apps/admin/src/lib/auth-client.ts`)
 - **Backend**: Elysia + oRPC server (`apps/server/src/index.ts`, `apps/server/src/routers/index.ts`)
 - **Database**: MongoDB via Mongoose (`apps/server/src/db/**`)
-- **Desktop**: Tauri 2 in `apps/web/src-tauri`
+- **Desktop**: Tauri 2 in `apps/admin/src-tauri`
 - **Repo tooling**: Bun, Turborepo, Biome linter/formatter with Ultracite rules
 
 ## Features
@@ -34,7 +34,8 @@ Production-ready SvelteKit + Elysia starter with type-safe RPC, modern UI, deskt
 ```
 magick-template/
 ├── apps/
-│   ├── web/         # Frontend (SvelteKit + Tauri)
+│   ├── admin/       # Admin Frontend (SvelteKit + Tauri)
+│   ├── client/      # Client Frontend (SvelteKit + Tauri)
 │   └── server/      # Backend (Elysia + oRPC + Better Auth + Mongoose)
 ├── turbo.json       # Turborepo pipelines
 ├── biome.json       # Biome + Ultracite config
@@ -89,7 +90,7 @@ Notes:
 bun dev
 ```
 
-- Web: `http://localhost:5173`
+- Admin: `http://localhost:5173`
 - API: `http://localhost:3000`
 
 ### 4) Build
@@ -100,7 +101,7 @@ bun build
 
 ### 5) Desktop (Tauri)
 
-From `apps/web`:
+From `apps/admin`:
 
 ```bash
 bun desktop:dev     # run desktop app
@@ -123,7 +124,7 @@ export const appRouter = {
 
 ### Client: call RPCs
 
-Use `orpc` helpers from `apps/web/src/lib/orpc.ts` with TanStack Query.
+Use `orpc` helpers from `apps/admin/src/lib/orpc.ts` with TanStack Query.
 
 ```ts
 import { orpc } from "$lib/orpc";
@@ -135,17 +136,17 @@ const helloQuery = createQuery(orpc.hello.queryOptions());
 ### Auth
 
 - Server session in ctx: `apps/server/src/lib/context.ts` uses `auth.api.getSession`.
-- Client: `apps/web/src/lib/auth-client.ts` exposes `authClient` (e.g., `authClient.useSession()`), see `apps/web/src/routes/dashboard/+page.svelte` and `apps/web/src/routes/login/+page.svelte`.
+- Client: `apps/admin/src/lib/auth-client.ts` exposes `authClient` (e.g., `authClient.useSession()`), see `apps/admin/src/routes/dashboard/+page.svelte` and `apps/admin/src/routes/login/+page.svelte`.
 
 ### UI components
 
-- Components live under `apps/web/src/lib/components/ui/**`.
-- Config: `apps/web/components.json` (shadcn-svelte) and `apps/web/jsrepo.json` (extras registry + paths).
-- Global styles/theme: `apps/web/src/app.css` (Tailwind 4 + CSS variables).
+- Components live under `apps/admin/src/lib/components/ui/**`.
+- Config: `apps/admin/components.json` (shadcn-svelte) and `apps/admin/jsrepo.json` (extras registry + paths).
+- Global styles/theme: `apps/admin/src/app.css` (Tailwind 4 + CSS variables).
 
 ### Edra (Tiptap) editor
 
-- Source in `apps/web/src/lib/components/edra/**` with rich extensions, toolbar, bubble menu, placeholders, and styles.
+- Source in `apps/admin/src/lib/components/edra/**` with rich extensions, toolbar, bubble menu, placeholders, and styles.
 
 ## Code Quality & Conventions
 
@@ -162,21 +163,21 @@ Root (`package.json`):
 
 - `bun dev` – run all apps (Turborepo)
 - `bun build` – build all apps
-- `bun dev:web` – run only web
+- `bun dev:admin` – run only admin
 - `bun dev:server` – run only server
 - `bun run check` – Biome check/fix
 
-Web (`apps/web/package.json`): `dev`, `build`, `preview`, `check`, `desktop:*`
+Admin (`apps/admin/package.json`): `dev`, `build`, `preview`, `check`, `desktop:*`
 
 Server (`apps/server/package.json`): `dev`, `build`, `check-types`, `start`
 
 ## Helpful File References
 
-- Web layout: `apps/web/src/routes/+layout.svelte`
-- Health check example: `apps/web/src/routes/+page.svelte`
-- Dashboard with protected data: `apps/web/src/routes/dashboard/+page.svelte`
-- Auth client: `apps/web/src/lib/auth-client.ts`
-- RPC client + Query: `apps/web/src/lib/orpc.ts`
+- Admin layout: `apps/admin/src/routes/+layout.svelte`
+- Health check example: `apps/admin/src/routes/+page.svelte`
+- Dashboard with protected data: `apps/admin/src/routes/dashboard/+page.svelte`
+- Auth client: `apps/admin/src/lib/auth-client.ts`
+- RPC client + Query: `apps/admin/src/lib/orpc.ts`
 - Server entry: `apps/server/src/index.ts`
 - Server context/auth: `apps/server/src/lib/context.ts`, `apps/server/src/lib/auth.ts`
 - DB client/models: `apps/server/src/db/**`

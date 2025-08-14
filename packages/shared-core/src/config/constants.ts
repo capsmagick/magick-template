@@ -7,7 +7,7 @@ export type Environment = z.infer<typeof EnvironmentSchema>;
 // Common constants
 export const DEFAULT_PORTS = {
     SERVER: 3000,
-    WEB: 5173,
+    ADMIN: 5173,
     CLIENT: 5175,
     DOCS: 3001,
 } as const;
@@ -15,13 +15,13 @@ export const DEFAULT_PORTS = {
 export const DEFAULT_URLS = {
     DEVELOPMENT: {
         SERVER: "http://localhost:3000",
-        WEB: "http://localhost:5173",
+        ADMIN: "http://localhost:5173",
         CLIENT: "http://localhost:5175",
         AUTH: "http://localhost:3000",
     },
     PRODUCTION: {
         SERVER: "https://api.example.com",
-        WEB: "https://app.example.com",
+        ADMIN: "https://admin.example.com",
         CLIENT: "https://client.example.com",
         AUTH: "https://api.example.com",
     },
